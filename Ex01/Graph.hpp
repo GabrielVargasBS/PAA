@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <stack>
 
 #define Vertex int
 
@@ -76,9 +77,54 @@ public:
         for(int i = 0; i < n-1; i++) {
             hasCycle = hasCycle && (adjacencyMatrix[i][i+1] == 1);
         }
-        hasCycle = hasCycle && (adjacencyMatrix[0][n-1] == 1);
 
         return hasCycle;
+    }
+
+    void enumerateCyclesDFSUtil(int v, vector<bool>& visited, stack<int>& path, int startVertex) {
+        visited[v] = true;
+        path.push(v);
+
+        for (int i = 0; i < numVertex; ++i) {
+            if (adjacencyMatrix[v][i]) {
+                if (!visited[i]) {
+                    enumerateCyclesDFSUtil(i, visited, path, startVertex);
+                } else if (i == startVertex && path.size() >= 3) {
+                    cout << "Cycle: ";
+                    stack<int> temp;
+                    bool cycleFound = false;
+                    while (!path.empty()) {
+                        cout << path.top() << " ";
+                        temp.push(path.top());
+                        if (path.top() == startVertex) {
+                            cycleFound = true;
+                        }
+                        path.pop();
+                    }
+                    cout << endl;
+                    if (cycleFound) {
+                        while (!temp.empty()) {
+                            path.push(temp.top());
+                            temp.pop();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        path.pop();
+        visited[v] = false;
+    }
+
+
+    void enumerateCyclesDFS() {
+        vector<bool> visited(numVertex, false);
+        stack<int> path;
+
+        for (int i = 0; i < numVertex; ++i) {
+            enumerateCyclesDFSUtil(i, visited, path, i);
+        }
     }
 };
 
