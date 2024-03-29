@@ -1,6 +1,7 @@
 #include "Graph.hpp"
 
-int main() {
+int main()
+{
     Graph g = Graph(5);
     g.initializeRandomGraph(10);
     g.print();
