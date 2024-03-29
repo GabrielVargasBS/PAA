@@ -6,18 +6,19 @@
 #include <vector>
 
 using namespace std;
+#define Vertex int
 
 class Combination {
 private:
-    vector<int> vertexArray;
-    int r;
+    vector<Vertex> vertexArray;
+    int combinationLength;
     vector<int> indices;
-    vector<vector<int>> combinations;
+    vector<vector<Vertex>> combinations;
 
     bool hasNext() {
         int n = vertexArray.size();
-        for (int i = r - 1; i >= 0; i--) {
-            if (indices[i] != i + n - r) {
+        for (int i = combinationLength - 1; i >= 0; i--) {
+            if (indices[i] != i + n - combinationLength) {
                 return true;
             }
         }
@@ -26,40 +27,44 @@ private:
 
     void generateNext() {
         int n = vertexArray.size();
-        int i = r - 1;
-        while (i >= 0 && indices[i] == i + n - r)
+        int i = combinationLength - 1;
+        while (i >= 0 && indices[i] == i + n - combinationLength)
             i--;
 
         if (i >= 0) {
             indices[i]++;
-            for (int j = i + 1; j < r; j++)
+            for (int j = i + 1; j < combinationLength; j++)
                 indices[j] = indices[j - 1] + 1;
         }
     }
 
 public:
-    Combination(const vector<int>& _vertexArray, int _r) : vertexArray(_vertexArray), r(_r) {
+    Combination(const vector<Vertex>& vertexArray, int combinationLength) {
+
+        this->vertexArray = vertexArray;
+        this->combinationLength = combinationLength;
+
         int n = vertexArray.size();
-        for (int i = 0; i < r; i++)
+        for (int i = 0; i < combinationLength; i++)
             indices.push_back(i);
     }
 
-    vector<vector<int>> generateCombinations() {
+    vector<vector<Vertex>> generateCombinations() {
         int n = vertexArray.size();
-        if (r == n) {
+        if (combinationLength == n) {
             combinations.push_back(vertexArray);
         } else {
             while (hasNext()) {
-                std::vector<int> temp;
-                for (int i = 0; i < r; i++) {
+                vector<Vertex> temp;
+                for (int i = 0; i < combinationLength; i++) {
                     temp.push_back(vertexArray[indices[i]]);
                 }
                 combinations.push_back(temp);
                 generateNext();
             }
 
-            std::vector<int> temp;
-            for (int i = 0; i < r; i++) {
+            vector<Vertex> temp;
+            for (int i = 0; i < combinationLength; i++) {
                 temp.push_back(vertexArray[indices[i]]);
             }
             combinations.push_back(temp);

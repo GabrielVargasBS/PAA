@@ -92,7 +92,7 @@ public:
         }
     }
 
-    void enumerateCyclesPermutation() {
+    void enumerateCyclesPermutation(int* count) {
 
         // Inicialize the vertex
         vector<Vertex> vertexArray(numVertex);
@@ -100,8 +100,8 @@ public:
             vertexArray[i] = i;
         }
 
-        // Loop in all possible cycle sizes
-        for(int k = 2; k <= numVertex; k++) {
+        // Loop in all possible cycle sizes with k > 2
+        for(int k = 3; k <= numVertex; k++) {
 
             printf("\nCycles with k = %d\n", k);
 
@@ -123,6 +123,7 @@ public:
                             printf("%d ", vertexPermutation[i]);
                         }
                         printf("%d\n", vertexPermutation[0]);
+                        *count = *count+1;
                     }
 
                     vertexPermutation = perm.nextPermutation();
@@ -132,28 +133,36 @@ public:
         }
     }
 
-    void enumerateCyclesDFSUtil(int v, vector<bool>& visited, stack<int>& path, int startVertex) {
+    void enumerateCyclesDFSUtil(int v, vector<bool>& visited, stack<int>& path, int startVertex, int* count) {
         visited[v] = true;
         path.push(v);
 
         for (int i = 0; i < numVertex; ++i) {
             if (adjacencyMatrix[v][i]) {
                 if (!visited[i]) {
-                    enumerateCyclesDFSUtil(i, visited, path, startVertex);
+                    enumerateCyclesDFSUtil(i, visited, path, startVertex, count);
                 } else if (i == startVertex && path.size() >= 3) {
-                    cout << "Cycle: ";
                     stack<int> temp;
                     bool cycleFound = false;
+                    vector<Vertex> cycle;
                     while (!path.empty()) {
-                        cout << path.top() << " ";
+                        cycle.push_back(path.top());
                         temp.push(path.top());
                         if (path.top() == startVertex) {
                             cycleFound = true;
                         }
                         path.pop();
                     }
-                    cout << endl;
+
                     if (cycleFound) {
+
+                        printf("Cycle: ");
+                        for(int i = 0; i < cycle.size() ; i++) {
+                            printf("%d ", cycle[i]);
+                        }
+                        printf("%d\n", cycle[0]);
+                        *count = *count+1;
+
                         while (!temp.empty()) {
                             path.push(temp.top());
                             temp.pop();
@@ -168,12 +177,12 @@ public:
         visited[v] = false;
     }
 
-    void enumerateCyclesDFS() {
+    void enumerateCyclesDFS(int* count) {
         vector<bool> visited(numVertex, false);
         stack<int> path;
 
         for (int i = 0; i < numVertex; ++i) {
-            enumerateCyclesDFSUtil(i, visited, path, i);
+            enumerateCyclesDFSUtil(i, visited, path, i, count);
         }
     }
 
