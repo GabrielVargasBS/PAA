@@ -3,21 +3,18 @@
 
 #include <iostream>
 #include <vector>
+#include <stdio.h>
+#include <stack>
+
+#include "Permutation.hpp"
+#include "Combination.hpp"
 
 #define Vertex int
 
 using namespace std;
 
 class Graph {
-public:
-    int numVertex;
-    vector<vector<bool>> adjacencyMatrix;
-
-    Graph(int numVertex) {
-        this->numVertex = numVertex;
-        adjacencyMatrix.resize(numVertex, vector<bool>(numVertex, 0));
-    }
-
+private:
     void add(Vertex source, Vertex destination) {
         adjacencyMatrix[source][destination] = 1;
         adjacencyMatrix[destination][source] = 1;
@@ -36,9 +33,34 @@ public:
         }
     }
 
+    bool hasCycle(vector<Vertex> vertexArray) {
+        bool hasCycle = true;
+
+        for(int i = 0; i < vertexArray.size() - 1; i++) {
+            Vertex v = vertexArray[i];
+            Vertex u = vertexArray[i+1];
+            hasCycle = hasCycle && (adjacencyMatrix[v][u] == 1);
+        }
+
+        // Last vertex must be adjacent to the first
+        Vertex firstVertex = vertexArray[0];
+        Vertex lastVertex = vertexArray[vertexArray.size() - 1];
+        hasCycle = hasCycle && (adjacencyMatrix[firstVertex][lastVertex] == 1);
+
+        return hasCycle;
+    }
+
+public:
+    int numVertex;
+    vector<vector<bool>> adjacencyMatrix;
+
+    Graph(int numVertex) {
+        this->numVertex = numVertex;
+        adjacencyMatrix.resize(numVertex, vector<bool>(numVertex, 0));
+    }
+
     void print() {
         for (int i = 0; i < numVertex; i++) {
-            // printf("%3d ", i + 1);
             for (int j = 0; j < numVertex; j++) {
                 if (adjacencyMatrix[i][j])
                     printf("x ");
@@ -53,7 +75,7 @@ public:
 
         reset();
 
-        srand(1);
+        srand(time(nullptr));
 
         int maxEdges = numVertex * (numVertex - 1) / 2;
         edgesCount = min(edgesCount, maxEdges);
@@ -70,16 +92,91 @@ public:
         }
     }
 
-    bool hasCycle(Vertex vertexArray[], int n) {
-        bool hasCycle = true;
+    void enumerateCyclesPermutation() {
 
-        for(int i = 0; i < n-1; i++) {
-            hasCycle = hasCycle && (adjacencyMatrix[i][i+1] == 1);
+        // Inicialize the vertex
+        vector<Vertex> vertexArray(numVertex);
+        for (int i = 0; i < numVertex; ++i) {
+            vertexArray[i] = i;
         }
-        hasCycle = hasCycle && (adjacencyMatrix[0][n-1] == 1);
 
-        return hasCycle;
+        // Loop in all possible cycle sizes
+        for(int k = 2; k <= numVertex; k++) {
+
+            printf("\nCycles with k = %d\n", k);
+
+            // Get all possible vertex combinations without repetition
+            Combination comb(vertexArray, k);
+            vector<vector<Vertex>> vertexCombination = comb.generateCombinations();
+
+            // For each combination of k vertices, get all possible permutations
+            for (vector<Vertex> combination : vertexCombination) {
+
+                Permutation perm(combination);
+
+                vector<Vertex> vertexPermutation = combination;
+
+                do {
+                    if(hasCycle(vertexPermutation)) {
+                        printf("Cycle: ");
+                        for(int i = 0; i < vertexPermutation.size() ; i++) {
+                            printf("%d ", vertexPermutation[i]);
+                        }
+                        printf("%d\n", vertexPermutation[0]);
+                    }
+
+                    vertexPermutation = perm.nextPermutation();
+
+                } while (!vertexPermutation.empty());
+            }
+        }
     }
+
+    void enumerateCyclesDFSUtil(int v, vector<bool>& visited, stack<int>& path, int startVertex) {
+        visited[v] = true;
+        path.push(v);
+
+        for (int i = 0; i < numVertex; ++i) {
+            if (adjacencyMatrix[v][i]) {
+                if (!visited[i]) {
+                    enumerateCyclesDFSUtil(i, visited, path, startVertex);
+                } else if (i == startVertex && path.size() >= 3) {
+                    cout << "Cycle: ";
+                    stack<int> temp;
+                    bool cycleFound = false;
+                    while (!path.empty()) {
+                        cout << path.top() << " ";
+                        temp.push(path.top());
+                        if (path.top() == startVertex) {
+                            cycleFound = true;
+                        }
+                        path.pop();
+                    }
+                    cout << endl;
+                    if (cycleFound) {
+                        while (!temp.empty()) {
+                            path.push(temp.top());
+                            temp.pop();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        path.pop();
+        visited[v] = false;
+    }
+
+    void enumerateCyclesDFS() {
+        vector<bool> visited(numVertex, false);
+        stack<int> path;
+
+        for (int i = 0; i < numVertex; ++i) {
+            enumerateCyclesDFSUtil(i, visited, path, i);
+        }
+    }
+
 };
 
 #endif

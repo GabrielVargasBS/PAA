@@ -2,11 +2,12 @@
 
 int main() {
     Graph g = Graph(10);
-    g.initializeRandomGraph(20);
+    g.initializeRandomGraph(2);
     g.print();
 
-    Vertex vertexArray[2] = {0, 1};
+    g.enumerateCyclesPermutation();
 
-    bool hasCycle = g.hasCycle(vertexArray , 2);
-    printf("hasCycle = %d", hasCycle);
+    printf("\n\n\n");
+
+    g.enumerateCyclesDFS();
 }
