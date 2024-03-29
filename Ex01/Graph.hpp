@@ -16,6 +16,9 @@ using namespace std;
 class Graph
 {
 private:
+    vector<vector<Vertex>> cyclesDFS;
+    vector<vector<Vertex>> cyclesPermutation;
+
     void add(Vertex source, Vertex destination)
     {
         adjacencyMatrix[source][destination] = 1;
@@ -107,52 +110,14 @@ public:
         }
     }
 
-    void enumerateCyclesPermutation(int *count)
+    const vector<vector<Vertex>> &getCyclesDFS() const
     {
+        return cyclesDFS;
+    }
 
-        // Inicialize the vertex
-        vector<Vertex> vertexArray(numVertex);
-        for (int i = 0; i < numVertex; ++i)
-        {
-            vertexArray[i] = i;
-        }
-
-        // Loop in all possible cycle sizes with k > 2
-        for (int k = 3; k <= numVertex; k++)
-        {
-
-            printf("\nCycles with k = %d\n", k);
-
-            // Get all possible vertex combinations without repetition
-            Combination comb(vertexArray, k);
-            vector<vector<Vertex>> vertexCombination = comb.generateCombinations();
-
-            // For each combination of k vertices, get all possible permutations
-            for (vector<Vertex> combination : vertexCombination)
-            {
-
-                Permutation perm(combination);
-
-                vector<Vertex> vertexPermutation = combination;
-
-                do
-                {
-                    if (hasCycle(vertexPermutation))
-                    {
-                        printf("Cycle: ");
-                        for (int i = 0; i < vertexPermutation.size(); i++)
-                        {
-                            printf("%d ", vertexPermutation[i]);
-                        }
-                        printf("%d\n", vertexPermutation[0]);
-                        *count = *count + 1;
-                    }
-
-                    vertexPermutation = perm.nextPermutation();
-
-                } while (!vertexPermutation.empty());
-            }
-        }
+    const vector<vector<Vertex>> &getCyclesPermutation() const
+    {
+        return cyclesPermutation;
     }
 
     void enumerateCyclesDFSUtil(int v, vector<bool> &visited, stack<int> &path, int startVertex, int *count)
@@ -170,38 +135,68 @@ public:
                 }
                 else if (i == startVertex && path.size() >= 3)
                 {
+                    // Recupera o ciclo encontrado
+                    vector<int> cycle;
                     stack<int> tempPath = path;
-                    tempPath.pop(); // Remove o vértice repetido no início do ciclo
-
-                    bool cycleFound = false;
-                    vector<Vertex> cycle;
 
                     while (!tempPath.empty())
                     {
                         cycle.push_back(tempPath.top());
                         if (tempPath.top() == startVertex)
                         {
-                            cycleFound = true;
+                            break;
                         }
                         tempPath.pop();
                     }
 
-                    if (cycleFound)
-                    {
-                        printf("Cycle: ");
-                        for (int i = cycle.size() - 1; i >= 0; i--)
-                        {
-                            printf("%d ", cycle[i]);
-                        }
-                        printf("%d\n", startVertex);
-                        *count = *count + 1;
-                    }
+                    // Armazena o ciclo encontrado
+                    cyclesDFS.push_back(cycle);
+                    *count = *count + 1;
                 }
             }
         }
 
         path.pop();
         visited[v] = false;
+    }
+
+    void enumerateCyclesPermutation(int *count)
+    {
+        // Inicialize o vetor de vértices
+        vector<Vertex> vertexArray(numVertex);
+        for (int i = 0; i < numVertex; ++i)
+        {
+            vertexArray[i] = i;
+        }
+
+        // Loop em todos os tamanhos de ciclo possíveis com k > 2
+        for (int k = 3; k <= numVertex; k++)
+        {
+            // Obtenha todas as combinações de vértices possíveis sem repetição
+            Combination comb(vertexArray, k);
+            vector<vector<Vertex>> vertexCombination = comb.generateCombinations();
+
+            // Para cada combinação de k vértices, obtenha todas as permutações possíveis
+            for (vector<Vertex> combination : vertexCombination)
+            {
+                Permutation perm(combination);
+
+                vector<Vertex> vertexPermutation = combination;
+
+                do
+                {
+                    if (hasCycle(vertexPermutation))
+                    {
+                        // Armazena o ciclo encontrado
+                        cyclesPermutation.push_back(vertexPermutation);
+                        *count = *count + 1;
+                    }
+
+                    vertexPermutation = perm.nextPermutation();
+
+                } while (!vertexPermutation.empty());
+            }
+        }
     }
 
     void
