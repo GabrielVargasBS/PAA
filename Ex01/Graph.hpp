@@ -16,19 +16,16 @@ using namespace std;
 class Graph
 {
 private:
+    int numVertex;
+    vector<vector<bool>> adjacencyMatrix;
+
     vector<vector<Vertex>> cyclesDFS;
     vector<vector<Vertex>> cyclesPermutation;
 
-    void add(Vertex source, Vertex destination)
+    void addVertex(Vertex source, Vertex destination)
     {
         adjacencyMatrix[source][destination] = 1;
         adjacencyMatrix[destination][source] = 1;
-    }
-
-    void remove(Vertex source, Vertex destination)
-    {
-        adjacencyMatrix[source][destination] = 0;
-        adjacencyMatrix[destination][source] = 0;
     }
 
     void reset()
@@ -61,10 +58,70 @@ private:
         return hasCycle;
     }
 
-public:
-    int numVertex;
-    vector<vector<bool>> adjacencyMatrix;
+    bool areCyclesEqual(const vector<Vertex> &cycle1, const vector<Vertex> &cycle2)
+    {
+        if (cycle1.size() != cycle2.size())
+            return false;
 
+        int n = cycle1.size();
+        for (int i = 0; i < n; i++)
+        {
+            bool equal = true;
+            for (int j = 0; j < n; j++)
+            {
+                if (cycle1[j] != cycle2[(i + j) % n])
+                {
+                    equal = false;
+                    break;
+                }
+            }
+            if (equal)
+                return true;
+        }
+
+        return false;
+    }
+
+    void enumerateCyclesDFSUtil(int v, vector<bool> &visited, stack<int> &path, int startVertex)
+    {
+        visited[v] = true;
+        path.push(v);
+
+        for (int i = 0; i < numVertex; ++i)
+        {
+            if (adjacencyMatrix[v][i])
+            {
+                if (!visited[i])
+                {
+                    enumerateCyclesDFSUtil(i, visited, path, startVertex);
+                }
+                else if (i == startVertex && path.size() >= 3)
+                {
+                    // Recupera o ciclo encontrado
+                    vector<int> cycle;
+                    stack<int> tempPath = path;
+
+                    while (!tempPath.empty())
+                    {
+                        cycle.push_back(tempPath.top());
+                        if (tempPath.top() == startVertex)
+                        {
+                            break;
+                        }
+                        tempPath.pop();
+                    }
+
+                    // Armazena o ciclo encontrado
+                    cyclesDFS.push_back(cycle);
+                }
+            }
+        }
+
+        path.pop();
+        visited[v] = false;
+    }
+
+public:
     Graph(int numVertex)
     {
         this->numVertex = numVertex;
@@ -104,7 +161,7 @@ public:
 
             if (source != destination && adjacencyMatrix[source][destination] == 0)
             {
-                add(source, destination);
+                addVertex(source, destination);
                 addedEdges++;
             }
         }
@@ -120,47 +177,7 @@ public:
         return cyclesPermutation;
     }
 
-    void enumerateCyclesDFSUtil(int v, vector<bool> &visited, stack<int> &path, int startVertex, int *count)
-    {
-        visited[v] = true;
-        path.push(v);
-
-        for (int i = 0; i < numVertex; ++i)
-        {
-            if (adjacencyMatrix[v][i])
-            {
-                if (!visited[i])
-                {
-                    enumerateCyclesDFSUtil(i, visited, path, startVertex, count);
-                }
-                else if (i == startVertex && path.size() >= 3)
-                {
-                    // Recupera o ciclo encontrado
-                    vector<int> cycle;
-                    stack<int> tempPath = path;
-
-                    while (!tempPath.empty())
-                    {
-                        cycle.push_back(tempPath.top());
-                        if (tempPath.top() == startVertex)
-                        {
-                            break;
-                        }
-                        tempPath.pop();
-                    }
-
-                    // Armazena o ciclo encontrado
-                    cyclesDFS.push_back(cycle);
-                    *count = *count + 1;
-                }
-            }
-        }
-
-        path.pop();
-        visited[v] = false;
-    }
-
-    void enumerateCyclesPermutation(int *count)
+    void enumerateCyclesPermutation()
     {
         // Inicialize o vetor de vértices
         vector<Vertex> vertexArray(numVertex);
@@ -189,7 +206,6 @@ public:
                     {
                         // Armazena o ciclo encontrado
                         cyclesPermutation.push_back(vertexPermutation);
-                        *count = *count + 1;
                     }
 
                     vertexPermutation = perm.nextPermutation();
@@ -199,16 +215,52 @@ public:
         }
     }
 
-    void
-    enumerateCyclesDFS(int *count)
+    void enumerateCyclesDFS()
     {
         vector<bool> visited(numVertex, false);
         stack<int> path;
 
         for (int i = 0; i < numVertex; ++i)
         {
-            enumerateCyclesDFSUtil(i, visited, path, i, count);
+            enumerateCyclesDFSUtil(i, visited, path, i);
         }
+    }
+
+    void printCycles(vector<vector<Vertex>> cycles)
+    {
+        printf("\nCiclos encontrados por permutação:\n");
+        for (const auto &cycle : cycles)
+        {
+            for (const auto &vertex : cycle)
+            {
+                printf("%d ", vertex);
+            }
+            printf("\n");
+        }
+    }
+
+    int findEqualCycles()
+    {
+        int equalCyclesCount = 0;
+        for (const auto &cycleDFS : cyclesDFS)
+        {
+            for (const auto &cyclePerm : cyclesPermutation)
+            {
+                if (areCyclesEqual(cycleDFS, cyclePerm))
+                {
+                    equalCyclesCount++;
+                    printf("\nCiclo igual encontrado: [");
+                    for (const auto &vertex : cycleDFS)
+                    {
+                        printf("%d ", vertex);
+                    }
+                    printf("\b]\n");
+                    break; // Para verificar o próximo ciclo DFS
+                }
+            }
+        }
+
+        return equalCyclesCount;
     }
 };
 

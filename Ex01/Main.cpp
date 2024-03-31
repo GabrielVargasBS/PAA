@@ -1,90 +1,130 @@
+#include <iostream>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
 #include "Graph.hpp"
-
-bool areCyclesEqual(const vector<Vertex> &cycle1, const vector<Vertex> &cycle2)
-{
-    if (cycle1.size() != cycle2.size())
-        return false;
-
-    int n = cycle1.size();
-    for (int i = 0; i < n; i++)
-    {
-        bool equal = true;
-        for (int j = 0; j < n; j++)
-        {
-            if (cycle1[j] != cycle2[(i + j) % n])
-            {
-                equal = false;
-                break;
-            }
-        }
-        if (equal)
-            return true;
-    }
-
-    return false;
-}
 
 int main()
 {
-    Graph g = Graph(4);
-    g.initializeRandomGraph(4);
-    g.print();
+    // Graph graph = Graph(4);
+    // graph.initializeRandomGraph(4);
 
-    int count1 = 0;
-    g.enumerateCyclesPermutation(&count1);
+    // // Encontrar ciclos
+    // graph.enumerateCyclesPermutation();
+    // graph.enumerateCyclesDFS();
 
-    int count2 = 0;
-    g.enumerateCyclesDFS(&count2);
+    // // Obtém os ciclos encontrados
+    // const vector<vector<Vertex>> &cyclesDFS = graph.getCyclesDFS();
+    // const vector<vector<Vertex>> &cyclesPermutation = graph.getCyclesPermutation();
 
-    // Obtém os ciclos encontrados
-    const vector<vector<Vertex>> &cyclesDFS = g.getCyclesDFS();
-    const vector<vector<Vertex>> &cyclesPermutation = g.getCyclesPermutation();
+    // // Mostrar ciclos encontrados
+    // graph.printCycles(cyclesDFS);
+    // graph.printCycles(cyclesPermutation);
 
-    printf("\nCiclos encontrados por permutação:\n");
-    for (const auto &cycle : cyclesPermutation)
-    {
-        for (const auto &vertex : cycle)
-        {
-            printf("%d ", vertex);
-        }
-        printf("\n");
+    // // Mostra ciclos iguais encontrados
+    // int equalCyclesCount = graph.findEqualCycles();
+    // printf("\nCiclos iguais encontrados: %d\n", equalCyclesCount);
+
+
+    // LOOP para gerar testes
+    // CENARIO A1: Grafos completos, variando número de vértices de 3 até limite
+    printf("\nCENARIO A1: Grafos completos, variando número de vértices [Permutação]\n");
+    for(int i = 3; i < 16; i++) {
+
+        printf("\nVértices = %2d ", i);
+
+        Graph graph = Graph(i);
+        int edges = (i)*(i-1)/2;
+        graph.initializeRandomGraph(edges);
+
+        auto start = high_resolution_clock::now();
+        graph.enumerateCyclesPermutation();
+        auto stop = high_resolution_clock::now();
+
+        auto duration = duration_cast<microseconds>(stop - start);
+        auto seconds = duration_cast<std::chrono::seconds>(duration);
+        duration -= seconds;
+        auto microseconds = duration_cast<std::chrono::microseconds>(duration);
+
+        cout << "-> duração: "
+            << seconds.count() << " segundos, "
+            << microseconds.count() << " microssegundos." << endl;
     }
 
-    printf("\nCiclos encontrados por DFS:\n");
-    for (const auto &cycle : cyclesDFS)
-    {
-        for (const auto &vertex : cycle)
-        {
-            printf("%d ", vertex);
-        }
-        printf("\n");
+    // CENARIO A2: Grafos completos, variando número de vértices de 3 até limite
+    printf("\nCENARIO A2: Grafos completos, variando número de vértices [DFS]\n");
+    for(int i = 3; i < 16; i++) {
+
+        printf("\nVértices = %2d ", i);
+
+        Graph graph = Graph(i);
+        int edges = (i)*(i-1)/2;
+        graph.initializeRandomGraph(edges);
+
+        auto start = high_resolution_clock::now();
+        graph.enumerateCyclesDFS();
+        auto stop = high_resolution_clock::now();
+
+        auto duration = duration_cast<microseconds>(stop - start);
+        auto seconds = duration_cast<std::chrono::seconds>(duration);
+        duration -= seconds;
+        auto microseconds = duration_cast<std::chrono::microseconds>(duration);
+
+        cout << "-> duração: "
+            << seconds.count() << " segundos, "
+            << microseconds.count() << " microssegundos." << endl;
     }
 
-    printf("\nCount Permutation = %d", count1);
-    printf("\nCount DFS = %d", count2);
-    printf("\n");
+    int vertex = 10;
+    int edges = (vertex)*(vertex-1)/2;
 
-    // Verifica e conta os ciclos iguais
-    int equalCyclesCount = 0;
-    for (const auto &cycleDFS : cyclesDFS)
-    {
-        for (const auto &cyclePerm : cyclesPermutation)
-        {
-            if (areCyclesEqual(cycleDFS, cyclePerm))
-            {
-                equalCyclesCount++;
-                printf("\nCiclo igual encontrado:\n");
-                for (const auto &vertex : cycleDFS)
-                {
-                    printf("%d ", vertex);
-                }
-                printf("\n");
-                break; // Para verificar o próximo ciclo DFS
-            }
-        }
+    // CENARIO B1: Grafos nulos até completo de 10 vértices, variando número de arestas
+    printf("\nCENARIO B1: Grafos nulo até completo de 10 vértices, variando número de arestas [Permutação]\n");
+    for(int i = 0; i < edges; i++) {
+
+        printf("\nArestas = %2d ", i);
+
+        Graph graph = Graph(vertex);
+        graph.initializeRandomGraph(i);
+
+        auto start = high_resolution_clock::now();
+        graph.enumerateCyclesPermutation();
+        auto stop = high_resolution_clock::now();
+
+        auto duration = duration_cast<microseconds>(stop - start);
+        auto seconds = duration_cast<std::chrono::seconds>(duration);
+        duration -= seconds;
+        auto microseconds = duration_cast<std::chrono::microseconds>(duration);
+
+        cout << "-> duração: "
+            << seconds.count() << " segundos, "
+            << microseconds.count() << " microssegundos." << endl;
     }
 
-    printf("\nCiclos iguais encontrados: %d\n", equalCyclesCount);
+    // CENARIO B2: Grafos nulos até completo de 10 vértices, variando número de arestas
+    printf("\nCENARIO B2: Grafos nulo até completo de 10 vértices, variando número de arestas [DFS]\n");
+    for(int i = 0; i < edges; i++) {
+
+        printf("\nArestas = %2d ", i);
+
+        Graph graph = Graph(vertex);
+        graph.initializeRandomGraph(i);
+
+        auto start = high_resolution_clock::now();
+        graph.enumerateCyclesDFS();
+        auto stop = high_resolution_clock::now();
+
+        auto duration = duration_cast<microseconds>(stop - start);
+        auto seconds = duration_cast<std::chrono::seconds>(duration);
+        duration -= seconds;
+        auto microseconds = duration_cast<std::chrono::microseconds>(duration);
+
+        cout << "-> duração: "
+            << seconds.count() << " segundos, "
+            << microseconds.count() << " microssegundos." << endl;
+    }
 
     return 0;
 }
