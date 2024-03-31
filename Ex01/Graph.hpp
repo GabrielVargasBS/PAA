@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdio.h>
 #include <stack>
+#include <chrono>
 
 #include "Permutation.hpp"
 #include "Combination.hpp"
@@ -160,8 +161,31 @@ public:
         visited[v] = false;
     }
 
+    void
+    enumerateCyclesDFS(int *count)
+    {
+        auto inicio = std::chrono::high_resolution_clock::now();
+
+        vector<bool> visited(numVertex, false);
+        stack<int> path;
+
+        for (int i = 0; i < numVertex; ++i)
+        {
+            enumerateCyclesDFSUtil(i, visited, path, i, count);
+        }
+
+        auto duracao = std::chrono::duration_cast<std::chrono::microseconds>(
+                           std::chrono::high_resolution_clock::now() - inicio)
+                           .count();
+
+        std::cout << "Tempo de execucao usando DFS: " << duracao << " microssegundos" << std::endl;
+    }
+
     void enumerateCyclesPermutation(int *count)
     {
+
+        auto inicio = std::chrono::high_resolution_clock::now();
+
         // Inicialize o vetor de vértices
         vector<Vertex> vertexArray(numVertex);
         for (int i = 0; i < numVertex; ++i)
@@ -197,18 +221,11 @@ public:
                 } while (!vertexPermutation.empty());
             }
         }
-    }
+        auto duracao = std::chrono::duration_cast<std::chrono::microseconds>(
+                           std::chrono::high_resolution_clock::now() - inicio)
+                           .count();
 
-    void
-    enumerateCyclesDFS(int *count)
-    {
-        vector<bool> visited(numVertex, false);
-        stack<int> path;
-
-        for (int i = 0; i < numVertex; ++i)
-        {
-            enumerateCyclesDFSUtil(i, visited, path, i, count);
-        }
+        std::cout << "Tempo de execucao usando Permutacao: " << duracao << " microssegundos" << std::endl;
     }
 };
 

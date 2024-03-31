@@ -26,7 +26,7 @@ bool areCyclesEqual(const vector<Vertex> &cycle1, const vector<Vertex> &cycle2)
 
 int main()
 {
-    Graph g = Graph(4);
+    Graph g = Graph(8);
     g.initializeRandomGraph(4);
     g.print();
 
@@ -40,7 +40,7 @@ int main()
     const vector<vector<Vertex>> &cyclesDFS = g.getCyclesDFS();
     const vector<vector<Vertex>> &cyclesPermutation = g.getCyclesPermutation();
 
-    printf("\nCiclos encontrados por permutação:\n");
+    printf("\nCiclos encontrados por permutacao:\n");
     for (const auto &cycle : cyclesPermutation)
     {
         for (const auto &vertex : cycle)
