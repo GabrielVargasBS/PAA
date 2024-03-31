@@ -41,21 +41,19 @@ private:
 
     bool hasCycle(vector<Vertex> vertexArray)
     {
-        bool hasCycle = true;
-
         for (int i = 0; i < vertexArray.size() - 1; i++)
         {
             Vertex v = vertexArray[i];
             Vertex u = vertexArray[i + 1];
-            hasCycle = hasCycle && (adjacencyMatrix[v][u] == 1);
+            if(adjacencyMatrix[v][u] == 0)
+                return false;
         }
 
         // Last vertex must be adjacent to the first
         Vertex firstVertex = vertexArray[0];
         Vertex lastVertex = vertexArray[vertexArray.size() - 1];
-        hasCycle = hasCycle && (adjacencyMatrix[firstVertex][lastVertex] == 1);
-
-        return hasCycle;
+        
+        return (adjacencyMatrix[firstVertex][lastVertex] == 1);
     }
 
     bool areCyclesEqual(const vector<Vertex> &cycle1, const vector<Vertex> &cycle2)
@@ -220,7 +218,7 @@ public:
         vector<bool> visited(numVertex, false);
         stack<int> path;
 
-        for (int i = 0; i < numVertex; ++i)
+        for (int i = 0; i < numVertex; i++)
         {
             enumerateCyclesDFSUtil(i, visited, path, i);
         }
