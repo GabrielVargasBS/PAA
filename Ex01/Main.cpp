@@ -27,7 +27,7 @@ int main()
         {
             Graph graph = Graph(vertex);
             int edges = (vertex)*(vertex-1)/2;
-            graph.initializeRandomGraph(edges);
+            graph.initializeRandomNonDirectedGraph(edges);
 
             // Permutação
             auto startPermutation = high_resolution_clock::now();
@@ -58,7 +58,7 @@ int main()
         for(int i = 0; i < NUM_TESTS; i++)
         {
             Graph graph = Graph(MAX_VERTEX);
-            graph.initializeRandomGraph(edges);
+            graph.initializeRandomNonDirectedGraph(edges);
 
             // Permutação
             auto startPermutation = high_resolution_clock::now();

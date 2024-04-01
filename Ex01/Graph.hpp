@@ -22,10 +22,15 @@ private:
     vector<vector<Vertex>> cyclesDFS;
     vector<vector<Vertex>> cyclesPermutation;
 
-    void addVertex(Vertex source, Vertex destination)
+    void addNonDirectedEdge(Vertex source, Vertex destination)
     {
         adjacencyMatrix[source][destination] = 1;
         adjacencyMatrix[destination][source] = 1;
+    }
+
+    void addDirectedEdge(Vertex source, Vertex destination)
+    {
+        adjacencyMatrix[source][destination] = 1;
     }
 
     void reset()
@@ -53,7 +58,7 @@ private:
         Vertex firstVertex = vertexArray[0];
         Vertex lastVertex = vertexArray[vertexArray.size() - 1];
         
-        return (adjacencyMatrix[firstVertex][lastVertex] == 1);
+        return (adjacencyMatrix[lastVertex][firstVertex] == 1);
     }
 
     bool areCyclesEqual(const vector<Vertex> &cycle1, const vector<Vertex> &cycle2)
@@ -141,7 +146,7 @@ public:
         }
     }
 
-    void initializeRandomGraph(int edgesCount)
+    void initializeRandomNonDirectedGraph(int edgesCount)
     {
 
         reset();
@@ -159,7 +164,31 @@ public:
 
             if (source != destination && adjacencyMatrix[source][destination] == 0)
             {
-                addVertex(source, destination);
+                addNonDirectedEdge(source, destination);
+                addedEdges++;
+            }
+        }
+    }
+
+    void initializeRandomDirectedGraph(int edgesCount)
+    {
+
+        reset();
+
+        srand(time(nullptr));
+
+        int maxEdges = numVertex * (numVertex - 1);
+        edgesCount = min(edgesCount, maxEdges);
+
+        int addedEdges = 0;
+        while (addedEdges < edgesCount)
+        {
+            Vertex source = rand() % numVertex;
+            Vertex destination = rand() % numVertex;
+
+            if (source != destination && adjacencyMatrix[source][destination] == 0)
+            {
+                addDirectedEdge(source, destination);
                 addedEdges++;
             }
         }
@@ -226,7 +255,7 @@ public:
 
     void printCycles(vector<vector<Vertex>> cycles)
     {
-        printf("\nCiclos encontrados por permutação:\n");
+        printf("\nCiclos encontrados:\n");
         for (const auto &cycle : cycles)
         {
             for (const auto &vertex : cycle)
@@ -260,6 +289,7 @@ public:
 
         return equalCyclesCount;
     }
+
 };
 
 #endif
