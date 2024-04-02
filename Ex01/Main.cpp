@@ -34,16 +34,20 @@ int main()
             graph.enumerateCyclesPermutation();
             auto stopPermutation = high_resolution_clock::now();
             testPermutacao.addDuration(startPermutation, stopPermutation);
+            testPermutacao.addMatrixAccess(graph.getMatrixAccessPermutation());
 
             // DFS
             auto startDFS = high_resolution_clock::now();
             graph.enumerateCyclesDFS();
             auto stopDFS = high_resolution_clock::now();
             testDFS.addDuration(startDFS, stopDFS);
+            testDFS.addMatrixAccess(graph.getMatrixAccessDFS());
         }
 
         testPermutacao.printExecutionTime("Permutação  ");
+        testPermutacao.printMatrixAccess("Permutação  ");
         testDFS.printExecutionTime("Caminhamento");
+        testDFS.printMatrixAccess("Caminhamento");
     }
 
     printf("\n\nCENARIO B: Grafos de 10 vértices, variando número de arestas\n");
@@ -65,16 +69,20 @@ int main()
             graph.enumerateCyclesPermutation();
             auto stopPermutation = high_resolution_clock::now();
             testPermutacao.addDuration(startPermutation, stopPermutation);
+            testPermutacao.addMatrixAccess(graph.getMatrixAccessPermutation());
 
             // DFS
             auto startDFS = high_resolution_clock::now();
             graph.enumerateCyclesDFS();
             auto stopDFS = high_resolution_clock::now();
             testDFS.addDuration(startDFS, stopDFS);
+            testDFS.addMatrixAccess(graph.getMatrixAccessDFS());
         }
 
         testPermutacao.printExecutionTime("Permutação  ");
+        testPermutacao.printMatrixAccess("Permutação  ");
         testDFS.printExecutionTime("Caminhamento");
+        testDFS.printMatrixAccess("Caminhamento");
     }
 
     return 0;

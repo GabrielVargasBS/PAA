@@ -22,6 +22,9 @@ private:
     vector<vector<Vertex>> cyclesDFS;
     vector<vector<Vertex>> cyclesPermutation;
 
+    int matrixAccessDFS = 0;
+    int matrixAccessPermutation = 0;
+
     void addNonDirectedEdge(Vertex source, Vertex destination)
     {
         adjacencyMatrix[source][destination] = 1;
@@ -35,6 +38,9 @@ private:
 
     void reset()
     {
+        matrixAccessDFS = 0;
+        matrixAccessPermutation = 0;
+
         for (int i = 0; i < numVertex; i++)
         {
             for (int j = 0; j < numVertex; j++)
@@ -46,19 +52,24 @@ private:
 
     bool hasCycle(vector<Vertex> vertexArray)
     {
+        bool hasCycle = true;
         for (int i = 0; i < vertexArray.size() - 1; i++)
         {
             Vertex v = vertexArray[i];
             Vertex u = vertexArray[i + 1];
-            if(adjacencyMatrix[v][u] == 0)
-                return false;
+
+            matrixAccessPermutation++;
+            hasCycle = hasCycle && (adjacencyMatrix[v][u] == 1);
         }
 
         // Last vertex must be adjacent to the first
         Vertex firstVertex = vertexArray[0];
         Vertex lastVertex = vertexArray[vertexArray.size() - 1];
-        
-        return (adjacencyMatrix[lastVertex][firstVertex] == 1);
+
+        matrixAccessPermutation++;
+        hasCycle = hasCycle && (adjacencyMatrix[lastVertex][firstVertex] == 1);
+
+        return hasCycle;
     }
 
     bool areCyclesEqual(const vector<Vertex> &cycle1, const vector<Vertex> &cycle2)
@@ -92,6 +103,7 @@ private:
 
         for (int i = 0; i < numVertex; ++i)
         {
+            matrixAccessDFS++;
             if (adjacencyMatrix[v][i])
             {
                 if (!visited[i])
@@ -148,9 +160,7 @@ public:
 
     void initializeRandomNonDirectedGraph(int edgesCount)
     {
-
         reset();
-
         srand(time(nullptr));
 
         int maxEdges = numVertex * (numVertex - 1) / 2;
@@ -172,9 +182,7 @@ public:
 
     void initializeRandomDirectedGraph(int edgesCount)
     {
-
         reset();
-
         srand(time(nullptr));
 
         int maxEdges = numVertex * (numVertex - 1);
@@ -204,8 +212,20 @@ public:
         return cyclesPermutation;
     }
 
+    int getMatrixAccessPermutation()
+    {
+        return matrixAccessPermutation;
+    }
+
+    const int getMatrixAccessDFS()
+    {
+        return matrixAccessDFS;
+    }
+
     void enumerateCyclesPermutation()
     {
+        matrixAccessPermutation = 0;
+
         // Inicialize o vetor de vértices
         vector<Vertex> vertexArray(numVertex);
         for (int i = 0; i < numVertex; ++i)
@@ -244,6 +264,8 @@ public:
 
     void enumerateCyclesDFS()
     {
+        matrixAccessDFS = 0;
+
         vector<bool> visited(numVertex, false);
         stack<int> path;
 
