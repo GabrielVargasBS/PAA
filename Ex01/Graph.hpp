@@ -52,49 +52,47 @@ private:
 
     bool hasCycle(vector<Vertex> vertexArray)
     {
-        bool hasCycle = true;
         for (int i = 0; i < vertexArray.size() - 1; i++)
         {
             Vertex v = vertexArray[i];
             Vertex u = vertexArray[i + 1];
-
             matrixAccessPermutation++;
-            hasCycle = hasCycle && (adjacencyMatrix[v][u] == 1);
+            if(adjacencyMatrix[v][u] == 0)
+                return false;
         }
 
         // Last vertex must be adjacent to the first
         Vertex firstVertex = vertexArray[0];
         Vertex lastVertex = vertexArray[vertexArray.size() - 1];
-
         matrixAccessPermutation++;
-        hasCycle = hasCycle && (adjacencyMatrix[lastVertex][firstVertex] == 1);
 
-        return hasCycle;
+        return (adjacencyMatrix[lastVertex][firstVertex] == 1);
     }
 
-    bool areCyclesEqual(const vector<Vertex> &cycle1, const vector<Vertex> &cycle2)
-    {
-        if (cycle1.size() != cycle2.size())
-            return false;
+    /* Função utilizada somente para verificação dos testes, sem intuito de análise computacional ou uso na solução da questão */
+    // bool areCyclesEqual(const vector<Vertex> &cycle1, const vector<Vertex> &cycle2)
+    // {
+    //     if (cycle1.size() != cycle2.size())
+    //         return false;
 
-        int n = cycle1.size();
-        for (int i = 0; i < n; i++)
-        {
-            bool equal = true;
-            for (int j = 0; j < n; j++)
-            {
-                if (cycle1[j] != cycle2[(i + j) % n])
-                {
-                    equal = false;
-                    break;
-                }
-            }
-            if (equal)
-                return true;
-        }
+    //     int n = cycle1.size();
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         bool equal = true;
+    //         for (int j = 0; j < n; j++)
+    //         {
+    //             if (cycle1[j] != cycle2[(i + j) % n])
+    //             {
+    //                 equal = false;
+    //                 break;
+    //             }
+    //         }
+    //         if (equal)
+    //             return true;
+    //     }
 
-        return false;
-    }
+    //     return false;
+    // }
 
     void enumerateCyclesDFSUtil(int v, vector<bool> &visited, stack<int> &path, int startVertex)
     {
@@ -288,29 +286,30 @@ public:
         }
     }
 
-    int findEqualCycles()
-    {
-        int equalCyclesCount = 0;
-        for (const auto &cycleDFS : cyclesDFS)
-        {
-            for (const auto &cyclePerm : cyclesPermutation)
-            {
-                if (areCyclesEqual(cycleDFS, cyclePerm))
-                {
-                    equalCyclesCount++;
-                    printf("\nCiclo igual encontrado: [");
-                    for (const auto &vertex : cycleDFS)
-                    {
-                        printf("%d ", vertex);
-                    }
-                    printf("\b]\n");
-                    break; // Para verificar o próximo ciclo DFS
-                }
-            }
-        }
+    /* Função utilizada somente para verificação dos testes, sem intuito de análise computacional ou uso na solução da questão */
+    // int findEqualCycles()
+    // {
+    //     int equalCyclesCount = 0;
+    //     for (const auto &cycleDFS : cyclesDFS)
+    //     {
+    //         for (const auto &cyclePerm : cyclesPermutation)
+    //         {
+    //             if (areCyclesEqual(cycleDFS, cyclePerm))
+    //             {
+    //                 equalCyclesCount++;
+    //                 printf("\nCiclo igual encontrado: [");
+    //                 for (const auto &vertex : cycleDFS)
+    //                 {
+    //                     printf("%d ", vertex);
+    //                 }
+    //                 printf("\b]\n");
+    //                 break; // Para verificar o próximo ciclo DFS
+    //             }
+    //         }
+    //     }
 
-        return equalCyclesCount;
-    }
+    //     return equalCyclesCount;
+    // }
 
 };
 

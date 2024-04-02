@@ -8,7 +8,7 @@ using namespace std::chrono;
 class Test {
 public:
     int numberOfExecutions;
-    long double matrixAccess;
+    double matrixAccess;
     vector<std::chrono::nanoseconds> duration;
 
     Test(int numberOfExecutions)

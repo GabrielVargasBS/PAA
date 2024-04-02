@@ -7,15 +7,11 @@ using namespace std::chrono;
 #include "Graph.hpp"
 #include "Tests/Test.cpp"
 
+#define NUM_TESTS 20
 #define MAX_VERTEX 10
-#define MAX_EDGES 45
-
-#define NUM_TESTS 10
 
 int main()
 {
-    printf("\nCENARIO A: Grafos completos, variando número de vértices\n");
-    
     for(int vertex = 3; vertex <= MAX_VERTEX; vertex++)
     {
         printf("\nVértices %d : \n", vertex);
@@ -23,45 +19,14 @@ int main()
         Test testPermutacao = Test(NUM_TESTS);
         Test testDFS = Test(NUM_TESTS);
 
-        for(int i = 0; i < NUM_TESTS; i++)
-        {
-            Graph graph = Graph(vertex);
-            int edges = (vertex)*(vertex-1)/2;
-            graph.initializeRandomNonDirectedGraph(edges);
-
-            // Permutação
-            auto startPermutation = high_resolution_clock::now();
-            graph.enumerateCyclesPermutation();
-            auto stopPermutation = high_resolution_clock::now();
-            testPermutacao.addDuration(startPermutation, stopPermutation);
-            testPermutacao.addMatrixAccess(graph.getMatrixAccessPermutation());
-
-            // DFS
-            auto startDFS = high_resolution_clock::now();
-            graph.enumerateCyclesDFS();
-            auto stopDFS = high_resolution_clock::now();
-            testDFS.addDuration(startDFS, stopDFS);
-            testDFS.addMatrixAccess(graph.getMatrixAccessDFS());
-        }
-
-        testPermutacao.printExecutionTime("Permutação  ");
-        testPermutacao.printMatrixAccess("Permutação  ");
-        testDFS.printExecutionTime("Caminhamento");
-        testDFS.printMatrixAccess("Caminhamento");
-    }
-
-    printf("\n\nCENARIO B: Grafos de 10 vértices, variando número de arestas\n");
-
-    for(int edges = 0; edges <= MAX_EDGES; edges+=5)
-    {
-        printf("\nArestas %d : \n", edges);
-
-        Test testPermutacao = Test(NUM_TESTS);
-        Test testDFS = Test(NUM_TESTS);
+        Graph graph = Graph(vertex);
 
         for(int i = 0; i < NUM_TESTS; i++)
         {
-            Graph graph = Graph(MAX_VERTEX);
+            srand(time(nullptr));
+            int maxEdges = vertex*(vertex-1)/2;
+            int edges = rand() % maxEdges;
+
             graph.initializeRandomNonDirectedGraph(edges);
 
             // Permutação
