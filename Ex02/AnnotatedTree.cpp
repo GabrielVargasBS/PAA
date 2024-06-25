@@ -30,9 +30,13 @@ AnnotatedTree::AnnotatedTree(Node *root, function<vector<Node *>(Node *)> get_ch
         int nid = j;
         for (Node *c : get_children(n))
         {
-            vector<int> a = anc;
-            a.insert(a.begin(), nid);
-            stack.push_back({c, a});
+            if (c != nullptr) {
+                vector<int> a = anc;
+                a.insert(a.begin(), nid);
+                stack.push_back({c, a});
+            } else {
+                std::cout << "Nó filho nulo encontrado!" << std::endl;
+            }
         }
         pstack.push_back({n, nid, anc});
         j++;
@@ -120,50 +124,64 @@ double AnnotatedTree::distance(Node *foo, Node *bar,
 
         auto treedist = [&](int i, int j)
         {
-            std::vector<int> &fool = foo_tree.lmds;
-            std::vector<int> &barl = bar_tree.lmds;
-            std::vector<Node *> &foon = foo_tree.nodes;
-            std::vector<Node *> &barn = bar_tree.nodes;
-
-            int m = i - fool[i] + 2;
-            int n = j - barl[j] + 2;
-            std::vector<std::vector<double>> fd(m, std::vector<double>(n, 0));
-
-            int ioff = fool[i] - 1;
-            int joff = barl[j] - 1;
-
-            for (int x = 1; x < m; ++x)
+            if (i < foo_tree.nodes.size() && j < bar_tree.nodes.size())
             {
-                fd[x][0] = fd[x - 1][0] + remove_cost(foon[x + ioff]);
-            }
-            for (int y = 1; y < n; ++y)
-            {
-                fd[0][y] = fd[0][y - 1] + insert_cost(barn[y + joff]);
-            }
-            for (int x = 1; x < m; ++x)
-            {
+                std::vector<int> &fool = foo_tree.lmds;
+                std::vector<int> &barl = bar_tree.lmds;
+                std::vector<Node *> &foon = foo_tree.nodes;
+                std::vector<Node *> &barn = bar_tree.nodes;
+
+                int m = i - fool[i] + 2;
+                int n = j - barl[j] + 2;
+                std::vector<std::vector<double>> fd(m, std::vector<double>(n, 0));
+
+                int ioff = fool[i] - 1;
+                int joff = barl[j] - 1;
+
+                for (int x = 1; x < m; ++x)
+                {
+                    fd[x][0] = fd[x - 1][0] + remove_cost(foon[x + ioff]);
+                }
                 for (int y = 1; y < n; ++y)
                 {
-                    if (fool[i] == fool[x + ioff] && barl[j] == barl[y + joff])
+                    fd[0][y] = fd[0][y - 1] + insert_cost(barn[y + joff]);
+                }
+                for (int x = 1; x < m; ++x)
+                {
+                    for (int y = 1; y < n; ++y)
                     {
-                        fd[x][y] = std::min({fd[x - 1][y] + remove_cost(foon[x + ioff]),
-                                             fd[x][y - 1] + insert_cost(barn[y + joff]),
-                                             fd[x - 1][y - 1] + update_cost(foon[x + ioff], barn[y + joff])});
-                        treedists[x + ioff][y + joff] = fd[x][y];
+                        if (fool[i] == fool[x + ioff] && barl[j] == barl[y + joff])
+                        {
+                            fd[x][y] = std::min({fd[x - 1][y] + remove_cost(foon[x + ioff]),
+                                                 fd[x][y - 1] + insert_cost(barn[y + joff]),
+                                                 fd[x - 1][y - 1] + update_cost(foon[x + ioff], barn[y + joff])});
+                            treedists[x + ioff][y + joff] = fd[x][y];
 
-                        std::cout << "Atualizando treedists[" << x + ioff << "][" << y + joff << "] = " << fd[x][y] << std::endl;
-                    }
-                    else
-                    {
-                        int pi = fool[x + ioff] - 1 - ioff;
-                        int qi = barl[y + joff] - 1 - joff;
-                        fd[x][y] = std::min({fd[x - 1][y] + remove_cost(foon[x + ioff]),
-                                             fd[x][y - 1] + insert_cost(barn[y + joff]),
-                                             fd[pi][qi] + treedists[x + ioff][y + joff]});
+                            std::cout << "Atualizando treedists[" << x + ioff << "][" << y + joff << "] = " << fd[x][y] << std::endl;
+                        }
+                        else
+                        {
+                            int pi = fool[x + ioff] - 1 - ioff;
+                            int qi = barl[y + joff] - 1 - joff;
+                            if (pi < fd.size() && qi < fd[pi].size() && x + ioff < treedists.size() && y + joff < treedists[x + ioff].size())
+                            {
+                                fd[x][y] = std::min({fd[x - 1][y] + remove_cost(foon[x + ioff]),
+                                                     fd[x][y - 1] + insert_cost(barn[y + joff]),
+                                                     fd[pi][qi] + treedists[x + ioff][y + joff]});
+                            }
+                            else
+                            {
+                                std::cerr << "Índices fora dos limites: pi = " << pi << ", qi = " << qi << ", x + ioff = " << x + ioff << ", y + joff = " << y + joff << std::endl;
+                            }
 
-                        std::cout << "Calculando fd[" << x << "][" << y << "] = " << fd[x][y] << std::endl;
+                            std::cout << "Calculando fd[" << x << "][" << y << "] = " << fd[x][y] << std::endl;
+                        }
                     }
                 }
+            }
+            else
+            {
+                std::cerr << "Índices fora dos limites: i = " << i << ", j = " << j << std::endl;
             }
         };
 

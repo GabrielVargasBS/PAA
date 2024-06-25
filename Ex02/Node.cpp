@@ -1,4 +1,5 @@
 #include "Node.h"
+#include <iostream>
 
 // Construtor que inicializa o nó com um rótulo e uma lista opcional de nós filhos
 Node::Node(string label, vector<Node *> children)
@@ -54,6 +55,10 @@ vector<Node *> Node::getChildren(Node *node)
 // Método estático que retorna o rótulo de um nó
 string Node::getLabel(Node *node)
 {
+    if (node == nullptr) {
+        std::cout << "Nó nulo encontrado!" << std::endl;
+        return "null";
+    }
     return node->label;
 }
 
