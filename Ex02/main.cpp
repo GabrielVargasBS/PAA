@@ -1,5 +1,6 @@
 #include <iostream>
 #include "AnnotatedTree.h"
+#include "Klein.h"
 #include <cstdlib>
 #include <ctime>
 
@@ -54,8 +55,8 @@ int main()
 {
     srand(static_cast<unsigned int>(time(nullptr)));
 
-    int maxDepth = 4;  // Profundidade máxima da árvore
-    int maxValue = 15; // Valor máximo dos nós
+    int maxDepth = 7;  // Profundidade máxima da árvore
+    int maxValue = 30; // Valor máximo dos nós
     int nodeCount1 = 0, nodeCount2 = 0;
 
     // Gere as árvores aleatoriamente
@@ -72,8 +73,10 @@ int main()
     std::cout << std::endl;
 
     double dist = AnnotatedTree::simple_distance(root1, root2);
+    std::cout << "Distancia entre as duas arvores por Zhang and Sasha: " << dist << std::endl;
 
-    std::cout << "Distancia entre as duas arvores: " << dist << std::endl;
+    int distance = treeEditDistance(root1, root2);
+    std::cout << "Distancia entre as duas arvores por Klein: " << distance << std::endl;
 
     delete root1;
     delete root2;

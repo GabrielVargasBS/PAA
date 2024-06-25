@@ -10,32 +10,35 @@ AnnotatedTree::AnnotatedTree(Node *root, function<vector<Node *>(Node *)> get_ch
     int j = 0;
     while (!stack.empty())
     {
-        std::cout << "Iniciando iteracao do loop while em AnnotatedTree::AnnotatedTree" << std::endl;
+        // std::cout << "Iniciando iteracao do loop while em AnnotatedTree::AnnotatedTree" << std::endl;
         Node *n;
         vector<int> anc;
         tie(n, anc) = stack.back();
         stack.pop_back();
 
-        std::cout << "Processando nó: " << Node::getLabel(n) << std::endl;
+        // std::cout << "Processando nó: " << Node::getLabel(n) << std::endl;
 
         // Imprima os filhos do nó atual
         auto children = get_children(n);
-        std::cout << "Filhos do nó " << Node::getLabel(n) << ": ";
+        // std::cout << "Filhos do nó " << Node::getLabel(n) << ": ";
         for (auto child : children)
         {
-            std::cout << Node::getLabel(child) << " ";
+            // std::cout << Node::getLabel(child) << " ";
         }
-        std::cout << std::endl;
+        // std::cout << std::endl;
 
         int nid = j;
         for (Node *c : get_children(n))
         {
-            if (c != nullptr) {
+            if (c != nullptr)
+            {
                 vector<int> a = anc;
                 a.insert(a.begin(), nid);
                 stack.push_back({c, a});
-            } else {
-                std::cout << "Nó filho nulo encontrado!" << std::endl;
+            }
+            else
+            {
+                // std::cout << "No filho nulo encontrado!" << std::endl;
             }
         }
         pstack.push_back({n, nid, anc});
@@ -111,14 +114,13 @@ double AnnotatedTree::distance(Node *foo, Node *bar,
                                std::function<double(Node *)> remove_cost,
                                std::function<double(Node *, Node *)> update_cost)
 {
-    std::cout << "Primeira linha de distance:" << std::endl;
     try
     {
         AnnotatedTree foo_tree(foo, get_children);
         AnnotatedTree bar_tree(bar, get_children);
 
-        std::cout << "Numero de nos na arvore foo: " << foo_tree.nodes.size() << std::endl;
-        std::cout << "Numero de nos na arvore bar: " << bar_tree.nodes.size() << std::endl;
+        // std::cout << "Numero de nos na arvore foo: " << foo_tree.nodes.size() << std::endl;
+        // std::cout << "Numero de nos na arvore bar: " << bar_tree.nodes.size() << std::endl;
 
         std::vector<std::vector<double>> treedists(foo_tree.nodes.size(), std::vector<double>(bar_tree.nodes.size(), 0));
 
@@ -157,7 +159,7 @@ double AnnotatedTree::distance(Node *foo, Node *bar,
                                                  fd[x - 1][y - 1] + update_cost(foon[x + ioff], barn[y + joff])});
                             treedists[x + ioff][y + joff] = fd[x][y];
 
-                            std::cout << "Atualizando treedists[" << x + ioff << "][" << y + joff << "] = " << fd[x][y] << std::endl;
+                            // std::cout << "Atualizando treedists[" << x + ioff << "][" << y + joff << "] = " << fd[x][y] << std::endl;
                         }
                         else
                         {
@@ -171,10 +173,10 @@ double AnnotatedTree::distance(Node *foo, Node *bar,
                             }
                             else
                             {
-                                std::cerr << "Índices fora dos limites: pi = " << pi << ", qi = " << qi << ", x + ioff = " << x + ioff << ", y + joff = " << y + joff << std::endl;
+                                // std::cerr << "Indices fora dos limites: pi = " << pi << ", qi = " << qi << ", x + ioff = " << x + ioff << ", y + joff = " << y + joff << std::endl;
                             }
 
-                            std::cout << "Calculando fd[" << x << "][" << y << "] = " << fd[x][y] << std::endl;
+                            // std::cout << "Calculando fd[" << x << "][" << y << "] = " << fd[x][y] << std::endl;
                         }
                     }
                 }
@@ -189,13 +191,11 @@ double AnnotatedTree::distance(Node *foo, Node *bar,
         {
             for (int j : bar_tree.keyroots)
             {
-                std::cout << "Calculando treedist para i = " << i << ", j = " << j << std::endl;
+                // std::cout << "Calculando treedist para i = " << i << ", j = " << j << std::endl;
                 treedist(i, j);
             }
         }
 
-        std::cout << "Ultima linha de distance:" << std::endl;
-        std::cout << "Valor final de treedists: " << treedists.back().back() << std::endl;
         return treedists.back().back();
     }
     catch (const std::exception &e)
@@ -207,5 +207,5 @@ double AnnotatedTree::distance(Node *foo, Node *bar,
         std::cerr << "Exceção desconhecida capturada" << std::endl;
     }
 
-    return 0; // Retorne algum valor padrão ou lance uma exceção aqui
+    return 0;
 }
