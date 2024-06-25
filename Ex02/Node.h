@@ -29,6 +29,9 @@ public:
 
     // Método estático que retorna o rótulo de um nó
     static string getLabel(Node *node);
+
+    // Declaração do destrutor
+    ~Node();
 };
 
 #endif

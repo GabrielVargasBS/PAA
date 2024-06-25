@@ -55,3 +55,11 @@ string Node::getLabel(Node *node)
 {
     return node->label;
 }
+
+Node::~Node()
+{
+    for (Node *child : children)
+    {
+        delete child;
+    }
+}
