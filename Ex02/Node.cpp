@@ -1,52 +1,57 @@
-#include <vector>
-#include <string>
+#include "Node.h"
 
-using namespace std;
+// Construtor que inicializa o nó com um rótulo e uma lista opcional de nós filhos
+Node::Node(string label, vector<Node *> children)
+{
+    this->label = label;
+    this->children = children;
+}
 
-class Node {
-public:
-    string label;
-    vector<Node*> children;
+// Adiciona um nó filho a este nó
+void Node::addKid(Node *child, bool before)
+{
+    if (before)
+    {
+        children.insert(children.begin(), child);
+    }
+    else
+    {
+        children.push_back(child);
+    }
+}
 
-    // Construtor que inicializa o nó com um rótulo e uma lista opcional de nós filhos
-    Node(string label, vector<Node*> children = {}) {
-        this->label = label;
-        this->children = children;
-    } 
+// Adiciona múltiplos nós filhos a este nó
+void Node::addChildren(vector<Node *> new_children)
+{
+    children.insert(children.end(), new_children.begin(), new_children.end());
+}
 
-    // Adiciona um nó filho a este nó
-    // Se 'before' for verdadeiro, o filho é inserido no início da lista de filhos
-    // Caso contrário, é adicionado ao final
-    void addKid(Node* child, bool before = false) {
-        if (before) {
-            children.insert(children.begin(), child);
-        } else {
-            children.push_back(child);
+// Procura um nó com um determinado rótulo nesta subárvore
+Node *Node::get(string search_label)
+{
+    if (label == search_label)
+    {
+        return this;
+    }
+    for (Node *child : children)
+    {
+        Node *result = child->get(search_label);
+        if (result != nullptr)
+        {
+            return result;
         }
     }
+    return nullptr;
+}
 
-    // Procura um nó com um determinado rótulo nesta subárvore
-    // Retorna o nó encontrado ou nullptr se nenhum nó com esse rótulo for encontrado
-    Node* get(string search_label) {
-        if (label == search_label) {
-            return this;
-        }
-        for (Node* child : children) {
-            Node* result = child->get(search_label);
-            if (result != nullptr) {
-                return result;
-            }
-        }
-        return nullptr;
-    }
+// Método estático que retorna os filhos de um nó
+vector<Node *> Node::getChildren(Node *node)
+{
+    return node->children;
+}
 
-    // Método estático que retorna os filhos de um nó
-    static vector<Node*> getChildren(Node* node) {
-        return node->children;
-    }
-
-    // Método estático que retorna o rótulo de um nó
-    static string getLabel(Node* node) {
-        return node->label;
-    }
-};
+// Método estático que retorna o rótulo de um nó
+string Node::getLabel(Node *node)
+{
+    return node->label;
+}
