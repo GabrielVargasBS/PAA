@@ -47,6 +47,7 @@ Node *Node::get(string search_label)
 // Método estático que retorna os filhos de um nó
 vector<Node *> Node::getChildren(Node *node)
 {
+
     return node->children;
 }
 
