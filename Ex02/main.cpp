@@ -3,8 +3,9 @@
 #include "Klein.h"
 #include <cstdlib>
 #include <ctime>
+#include <set>
 
-Node *generateRandomTree(int maxDepth, int maxValue, int &nodeCount)
+Node *generateRandomTree(int maxDepth, int maxValue, int &nodeCount, std::set<int> &usedValues)
 {
     if (maxDepth == 0)
     {
@@ -13,6 +14,17 @@ Node *generateRandomTree(int maxDepth, int maxValue, int &nodeCount)
 
     // Gere um valor aleatório entre 1 e maxValue
     int value = rand() % maxValue + 1;
+
+    // Verifique se o valor já foi usado
+    while (usedValues.find(value) != usedValues.end())
+    {
+        // Gere um novo valor
+        value = rand() % maxValue + 1;
+    }
+
+    // Adicione o valor ao conjunto de valores usados
+    usedValues.insert(value);
+
     Node *root = new Node(std::to_string(value));
     nodeCount++;
 
@@ -20,7 +32,7 @@ Node *generateRandomTree(int maxDepth, int maxValue, int &nodeCount)
     int numChildren = rand() % 3; // 0, 1 ou 2 filhos
     for (int i = 0; i < numChildren; ++i)
     {
-        root->addKid(generateRandomTree(maxDepth - 1, maxValue, nodeCount), false);
+        root->addKid(generateRandomTree(maxDepth - 1, maxValue, nodeCount, usedValues), false);
     }
 
     return root;
@@ -54,14 +66,15 @@ void printTree(Node *root, const std::string &prefix = "", bool isLast = true)
 int main()
 {
     srand(static_cast<unsigned int>(time(nullptr)));
+    std::set<int> usedValues;
 
-    int maxDepth = 7;  // Profundidade máxima da árvore
-    int maxValue = 30; // Valor máximo dos nós
+    int maxDepth = 5;  // Profundidade máxima da árvore
+    int maxValue = 32; // Valor máximo dos nós
     int nodeCount1 = 0, nodeCount2 = 0;
 
     // Gere as árvores aleatoriamente
-    Node *root1 = generateRandomTree(maxDepth, maxValue, nodeCount1);
-    Node *root2 = generateRandomTree(maxDepth, maxValue, nodeCount2);
+    Node *root1 = generateRandomTree(maxDepth, maxValue, nodeCount1, usedValues);
+    Node *root2 = generateRandomTree(maxDepth, maxValue, nodeCount2, usedValues);
 
     // Imprime as árvores geradas
     std::cout << "Arvore 1:" << std::endl;

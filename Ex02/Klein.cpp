@@ -5,15 +5,8 @@
 int treeEditDistanceHeavy(const std::vector<Node *> &heavySubtrees1,
                           const std::vector<Node *> &heavySubtrees2)
 {
-
     int size1 = heavySubtrees1.size();
     int size2 = heavySubtrees2.size();
-
-    // Caso base: se ambas as subárvores tiverem apenas um nó
-    if (size1 == 1 && size2 == 1)
-    {
-        return (Node::getLabel(heavySubtrees1[0]) == Node::getLabel(heavySubtrees2[0])) ? 0 : 1;
-    }
 
     // 2. Criar e inicializar a tabela de programação dinâmica
     std::vector<std::vector<int>> dp(size1 + 1, std::vector<int>(size2 + 1, 0));
@@ -28,17 +21,15 @@ int treeEditDistanceHeavy(const std::vector<Node *> &heavySubtrees1,
         dp[0][j] = dp[0][j - 1] + subtreeSize(heavySubtrees2[j - 1]);
     }
 
-    // 4. Calcular a distância de edição recursivamente
+    // 4. Calcular a distância de edição
     for (int i = 1; i <= size1; ++i)
     {
         for (int j = 1; j <= size2; ++j)
         {
             int removeT1 = dp[i - 1][j] + subtreeSize(heavySubtrees1[i - 1]);
             int removeT2 = dp[i][j - 1] + subtreeSize(heavySubtrees2[j - 1]);
-            // Chama recursivamente a função auxiliar, passando as subárvores pesadas
-            int transform = dp[i - 1][j - 1] + treeEditDistanceHeavy(
-                                                   std::vector<Node *>(heavySubtrees1.begin() + i, heavySubtrees1.end()),
-                                                   std::vector<Node *>(heavySubtrees2.begin() + j, heavySubtrees2.end()));
+            int transform = dp[i - 1][j - 1] +
+                            ((Node::getLabel(heavySubtrees1[i - 1]) == Node::getLabel(heavySubtrees2[j - 1])) ? 0 : 1);
 
             dp[i][j] = std::min(removeT1, std::min(removeT2, transform));
         }
@@ -73,37 +64,44 @@ int subtreeSize(Node *root)
     return size;
 }
 
-// Função para decompor a árvore em subárvores pesadas
-std::vector<Node *> decomposeTree(Node *root)
+void decomposeTree(Node *root, std::vector<Node *> &heavySubtrees)
 {
-    std::vector<Node *> heavySubtrees;
     if (root == nullptr)
     {
-        return heavySubtrees;
+        return;
     }
 
-    heavySubtrees.push_back(root); // A raiz sempre é uma subárvore pesada
-
-    // Encontra o PRIMEIRO filho com a maior subárvore
-    Node *heaviestChild = nullptr;
+    // Encontra TODOS os filhos com a maior subárvore
     int maxChildSize = 0;
+    std::vector<Node *> heaviestChildren;
     for (Node *child : root->children)
     {
         int childSize = subtreeSize(child);
-        // Atualiza o filho mais pesado APENAS se o tamanho for ESTRITAMENTE maior
         if (childSize > maxChildSize)
         {
+            // Novo tamanho máximo encontrado, limpa a lista de filhos mais pesados
             maxChildSize = childSize;
-            heaviestChild = child;
+            heaviestChildren.clear();
+            heaviestChildren.push_back(child);
+        }
+        else if (childSize == maxChildSize)
+        {
+            // Empate no tamanho máximo, adiciona o filho à lista de filhos mais pesados
+            heaviestChildren.push_back(child);
         }
     }
 
-    // Decompõe recursivamente apenas o filho mais pesado
-    if (heaviestChild != nullptr)
+    // Decompõe recursivamente TODOS os filhos mais pesados
+    for (Node *heavyChild : heaviestChildren)
     {
-        std::vector<Node *> childSubtrees = decomposeTree(heaviestChild);
-        heavySubtrees.insert(heavySubtrees.end(), childSubtrees.begin(), childSubtrees.end());
+        heavySubtrees.push_back(heavyChild);
+        decomposeTree(heavyChild, heavySubtrees);
     }
-
+}
+std::vector<Node *> decomposeTree(Node *root)
+{
+    std::vector<Node *> heavySubtrees;
+    heavySubtrees.push_back(root); // A raiz sempre é uma subárvore pesada
+    decomposeTree(root, heavySubtrees);
     return heavySubtrees;
 }
