@@ -5,7 +5,7 @@
 #include <ctime>
 #include <set>
 
-Node *generateRandomTree(int maxDepth, int maxValue, int &nodeCount, std::set<int> &usedValues)
+Node *generateRandomTree(int maxDepth, int maxValue, int &nodeCount, set<int> &usedValues)
 {
     if (maxDepth == 0)
     {
@@ -25,7 +25,7 @@ Node *generateRandomTree(int maxDepth, int maxValue, int &nodeCount, std::set<in
     // Adicione o valor ao conjunto de valores usados
     usedValues.insert(value);
 
-    Node *root = new Node(std::to_string(value));
+    Node *root = new Node(to_string(value));
     nodeCount++;
 
     // Gere de 0 a 2 filhos recursivamente
@@ -68,7 +68,7 @@ int main()
     srand(static_cast<unsigned int>(time(nullptr)));
     std::set<int> usedValues;
 
-    int maxDepth = 5;  // Profundidade máxima da árvore
+    int maxDepth = 4;  // Profundidade máxima da árvore
     int maxValue = 32; // Valor máximo dos nós
     int nodeCount1 = 0, nodeCount2 = 0;
 

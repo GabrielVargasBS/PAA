@@ -1,17 +1,20 @@
 #include "Klein.h"
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
 
 // Função auxiliar para calcular a distância de edição entre duas árvores,
-// dadas suas subárvores pesadas
-int treeEditDistanceHeavy(const std::vector<Node *> &heavySubtrees1,
-                          const std::vector<Node *> &heavySubtrees2)
+int treeEditDistanceHeavy(const vector<Node *> &heavySubtrees1, const vector<Node *> &heavySubtrees2)
 {
     int size1 = heavySubtrees1.size();
     int size2 = heavySubtrees2.size();
 
-    // 2. Criar e inicializar a tabela de programação dinâmica
-    std::vector<std::vector<int>> dp(size1 + 1, std::vector<int>(size2 + 1, 0));
+    // Criar e inicializar a tabela de programação dinâmica
+    vector<vector<int>> dp(size1 + 1, vector<int>(size2 + 1, 0));
 
-    // 3. Preencher a primeira linha e coluna da tabela
+    // Preencher a primeira linha e coluna da tabela
     for (int i = 1; i <= size1; ++i)
     {
         dp[i][0] = dp[i - 1][0] + subtreeSize(heavySubtrees1[i - 1]);
@@ -21,7 +24,7 @@ int treeEditDistanceHeavy(const std::vector<Node *> &heavySubtrees1,
         dp[0][j] = dp[0][j - 1] + subtreeSize(heavySubtrees2[j - 1]);
     }
 
-    // 4. Calcular a distância de edição
+    // Calcular a distância de edição
     for (int i = 1; i <= size1; ++i)
     {
         for (int j = 1; j <= size2; ++j)
@@ -31,7 +34,7 @@ int treeEditDistanceHeavy(const std::vector<Node *> &heavySubtrees1,
             int transform = dp[i - 1][j - 1] +
                             ((Node::getLabel(heavySubtrees1[i - 1]) == Node::getLabel(heavySubtrees2[j - 1])) ? 0 : 1);
 
-            dp[i][j] = std::min(removeT1, std::min(removeT2, transform));
+            dp[i][j] = min(removeT1, min(removeT2, transform));
         }
     }
 
@@ -40,12 +43,10 @@ int treeEditDistanceHeavy(const std::vector<Node *> &heavySubtrees1,
 
 int treeEditDistance(Node *tree1, Node *tree2)
 {
+    // Obter as subárvores pesadas (apenas uma vez)
+    vector<Node *> heavySubtrees1 = decomposeTree(tree1);
+    vector<Node *> heavySubtrees2 = decomposeTree(tree2);
 
-    // 1. Obter as subárvores pesadas (apenas uma vez)
-    std::vector<Node *> heavySubtrees1 = decomposeTree(tree1);
-    std::vector<Node *> heavySubtrees2 = decomposeTree(tree2);
-
-    // 2. Chamar a função auxiliar para calcular a distância
     return treeEditDistanceHeavy(heavySubtrees1, heavySubtrees2);
 }
 
@@ -64,7 +65,7 @@ int subtreeSize(Node *root)
     return size;
 }
 
-void decomposeTree(Node *root, std::vector<Node *> &heavySubtrees)
+void decomposeTree(Node *root, vector<Node *> &heavySubtrees)
 {
     if (root == nullptr)
     {
@@ -73,7 +74,7 @@ void decomposeTree(Node *root, std::vector<Node *> &heavySubtrees)
 
     // Encontra TODOS os filhos com a maior subárvore
     int maxChildSize = 0;
-    std::vector<Node *> heaviestChildren;
+    vector<Node *> heaviestChildren;
     for (Node *child : root->children)
     {
         int childSize = subtreeSize(child);
@@ -91,17 +92,18 @@ void decomposeTree(Node *root, std::vector<Node *> &heavySubtrees)
         }
     }
 
-    // Decompõe recursivamente TODOS os filhos mais pesados
+    // Adiciona todos os filhos mais pesados na lista de subárvores pesadas
     for (Node *heavyChild : heaviestChildren)
     {
         heavySubtrees.push_back(heavyChild);
         decomposeTree(heavyChild, heavySubtrees);
     }
 }
-std::vector<Node *> decomposeTree(Node *root)
+
+vector<Node *> decomposeTree(Node *root)
 {
-    std::vector<Node *> heavySubtrees;
-    heavySubtrees.push_back(root); // A raiz sempre é uma subárvore pesada
+    vector<Node *> heavySubtrees;
+    heavySubtrees.push_back(root);
     decomposeTree(root, heavySubtrees);
     return heavySubtrees;
 }
